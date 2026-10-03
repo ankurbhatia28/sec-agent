@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.env
+.cache/
+data/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# Private planning docs (kept local)
+SEC Filings Retrieval Agent — Project Overview.*
+SEC Retrieval Agent — Decision Doc.*

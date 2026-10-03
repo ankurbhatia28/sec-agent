@@ -1,0 +1,58 @@
+# Model registry: every LLM call in the codebase goes through an alias defined here.
+#
+#   model:   LiteLLM model string (provider/model-id)
+#   family:  vendor family; judges must come from a different family than the generator
+#   roles:   gen (answer generation), judge (evaluator), dev (cheap smoke/dev loops)
+#   params:  default call params, overridable per call (e.g. reasoning_effort -> Claude output_config.effort)
+#
+# Prices come from LiteLLM's model cost map; check with:
+#   uv run python -c "import litellm; print(litellm.model_cost['<model>'])"
+
+models:
+  # --- Anthropic (direct key: native prompt caching + Batch API) ---
+  claude-sonnet:
+    model: anthropic/claude-sonnet-5-5
+    family: anthropic
+    roles: [gen, judge]
+    params: {reasoning_effort: low, max_tokens: 4096}
+  claude-haiku:
+    model: anthropic/claude-haiku-4-5
+    family: anthropic
+    roles: [gen, judge, dev]
+    params: {max_tokens: 4096}
+
+  # --- OpenAI (direct key: automatic prefix caching + Batch API) ---
+  gpt-luna:
+    model: openai/gpt-6-luna
+    family: openai
+    roles: [gen, judge, dev]
+    params: {reasoning_effort: low, max_tokens: 4096}
+  gpt-sol:
+    model: openai/gpt-6.1-sol
+    family: openai
+    roles: [gen, judge]
+    params: {reasoning_effort: low, max_tokens: 4096}
+
+  # --- OpenRouter (one key for open-weight + other vendors) ---
+  qwen-flash:
+    model: openrouter/qwen/qwen3.8-flash
+    family: qwen
+    roles: [gen, judge, dev]
+    params: {max_tokens: 4096}
+  qwen-free:
+    model: openrouter/qwen/qwen3.8-27b:free
+    family: qwen
+    roles: [dev]  # rate-limited free tier; never for full eval runs
+    params: {max_tokens: 2048}
+  deepseek-pro:
+    model: openrouter/deepseek/deepseek-v4-pro
+    family: deepseek
+    roles: [gen, judge]
+    params: {max_tokens: 4096}
+
+  # --- Local (requires Ollama + `ollama pull qwen3:8b`; intended for the 48GB machine) ---
+  qwen-local:
+    model: ollama/qwen3:8b
+    family: qwen
+    roles: [dev]
+    params: {max_tokens: 2048}
